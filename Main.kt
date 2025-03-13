@@ -20,16 +20,24 @@ class MemoryGame(private val boardSize: Int) {
         val yellowPairs = totalPairs - redBluePairs - 1
         val blackPair = 1
 
+        // Put card
         repeat(redBluePairs) {
             cards.add(Card("V${it + 1}", "Vermelho"))
             cards.add(Card("V${it + 1}", "Vermelho"))
             cards.add(Card("A${it + 1}", "Azul"))
             cards.add(Card("A${it + 1}", "Azul"))
         }
+        repeat(yellowPairs) {
+            cards.add(Card("Y${it + 1}", "Amarelo"))
+            cards.add(Card("Y${it + 1}", "Amarelo"))
+        }
+        cards.add(Card("P1", "Preto"))
+        cards.add(Card("P1", "Preto"))
 
         // Embaralhar
         cards.shuffle()
 
+        // Board
         var index = 0
         for (i in 0 until boardSize) {
             for (j in 0 until boardSize) {
@@ -40,6 +48,28 @@ class MemoryGame(private val boardSize: Int) {
     }
 }
 
-fun main() {
+//fun addPlayer
 
+
+
+//fun Play
+
+fun main() {
+    println{"Tam tab:"}
+    println("a. 4x4")
+    println("b. 6x6")
+    println("c. 8x8")
+    println("d. 10x10")
+    val option = readln().lowercase()
+
+    val boardSize = when (option) {
+        "a" -> 4
+        "b" -> 6
+        "c" -> 8
+        "d" -> 10
+        else -> {
+            println("Opção inválida. Usando tamanho padrão 4x4.")
+            4
+        }
+    }
 }
