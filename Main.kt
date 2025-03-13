@@ -41,18 +41,42 @@ class MemoryGame(private val boardSize: Int) {
         var index = 0
         for (i in 0 until boardSize) {
             for (j in 0 until boardSize) {
-                board[i][j] = cards[index]
+                board[i][j] = cards[index].apply {isRevealed = true}//cartas viradas(test)
                 index++
             }
         }
     }
+
+    //jogar num loop na fun Play!!!!!!!!
+    fun printBoard() {
+
+        println("\nTabul:")
+        for (i in 0 until boardSize) {
+            for (j in 0 until boardSize) {
+                val card = board[i][j]
+                if (card?.isRevealed == true) {
+                    print("${card.value}(${card.color}) ")
+                } else {
+                    print("C ")
+                }
+            }
+            println()
+        }
+    }
+
+
 }
+
+
 
 //fun addPlayer
 
 
 
+
 //fun Play
+
+
 
 fun main() {
     println{"Tam tab:"}
@@ -72,4 +96,13 @@ fun main() {
             4
         }
     }
+
+
+    ///
+    val game = MemoryGame(boardSize)
+
+    game.printBoard()
+    ///
+
+
 }
