@@ -16,17 +16,22 @@ class MemoryGame(private val boardSize: Int) {
         val totalPairs = boardSize * boardSize / 2
 
         // Distrib pairs
-        val redBluePairs = totalPairs / 2
-        val yellowPairs = totalPairs - redBluePairs - 1
+        val bluePairs = (totalPairs / 4)
+        val redPairs = (totalPairs / 4)
+        val yellowPairs = (totalPairs - (redPairs + bluePairs)) - 1
         val blackPair = 1
 
         // Put card
-        repeat(redBluePairs) {
+        repeat(redPairs) {
             cards.add(Card("V${it + 1}", "Vermelho"))
             cards.add(Card("V${it + 1}", "Vermelho"))
+        }
+
+        repeat(bluePairs) {
             cards.add(Card("A${it + 1}", "Azul"))
             cards.add(Card("A${it + 1}", "Azul"))
         }
+
         repeat(yellowPairs) {
             cards.add(Card("Y${it + 1}", "Amarelo"))
             cards.add(Card("Y${it + 1}", "Amarelo"))
