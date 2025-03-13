@@ -47,9 +47,7 @@ class MemoryGame(private val boardSize: Int) {
         }
     }
 
-    //jogar num loop na fun Play!!!!!!!!
-    fun printBoard() {
-
+    fun printBoard(){
         println("\nTabul:")
         for (i in 0 until boardSize) {
             for (j in 0 until boardSize) {
@@ -64,17 +62,19 @@ class MemoryGame(private val boardSize: Int) {
         }
     }
 
+    //fun Play
+    fun play(){
+        while (true){
+            printBoard()
+            break
 
-}
 
-
+        }
+    }
 
 //fun addPlayer
+}
 
-
-
-
-//fun Play
 
 
 
@@ -101,7 +101,7 @@ fun main() {
     ///
     val game = MemoryGame(boardSize)
 
-    game.printBoard()
+    game.play()
     ///
 
 
