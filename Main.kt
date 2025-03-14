@@ -1,10 +1,12 @@
 import kotlin.random.Random
 
 data class Card(val value: String, val color: String, var isRevealed: Boolean = false)
+data class Player(val name: String, val color: String, var score: Int = 0)
 
 //cosntruror MG
 class MemoryGame(private val boardSize: Int) {
     private val board = Array(boardSize) { Array<Card?>(boardSize) { null } }
+    val players = mutableListOf<Player>()
     private val colors = listOf("Vermelho", "Azul", "Amarelo", "Preto")
 
     init {
@@ -69,17 +71,21 @@ class MemoryGame(private val boardSize: Int) {
         }
     }
 
+    //Função adicionar jogador
+    fun addPlayer(name: String, color: String) {
+        players.add(Player(name, color))
+    }
 
 }
 
 
 
-//fun addPlayer
 
 
 
 
 //fun Play
+
 
 
 
@@ -105,6 +111,18 @@ fun main() {
 
     ///
     val game = MemoryGame(boardSize)
+
+    println("Informe o nome do Jogador 1")
+    val player1Name = readln()
+    println("Informe o nome do Jogador 2")
+    val player2Name = readln()
+
+    game.addPlayer(player1Name, "Vermelho")
+    game.addPlayer(player2Name, "Azul")
+
+    game.players.forEach { players ->
+        println("Nome: ${players.name}, Cor: ${players.color}")
+    }
 
     game.printBoard()
     ///
