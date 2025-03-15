@@ -1,4 +1,9 @@
+import kotlin.collections.get
+import kotlin.collections.minusAssign
+import kotlin.collections.plusAssign
+import kotlin.compareTo
 import kotlin.random.Random
+import kotlin.text.get
 
 data class Card(val value: String, val color: String, var isRevealed: Boolean = false)
 data class Player(val name: String, val color: String, var score: Int = 0)
@@ -6,7 +11,9 @@ data class Player(val name: String, val color: String, var score: Int = 0)
 //cosntruror MG
 class MemoryGame(private val boardSize: Int) {
     private val board = Array(boardSize) { Array<Card?>(boardSize) { null } }
-    val players = mutableListOf<Player>()
+    private val players = mutableListOf<Player>()
+    private var currentPlayerIndex = 0
+
     private val colors = listOf("Vermelho", "Azul", "Amarelo", "Preto")
 
     init {
@@ -21,7 +28,6 @@ class MemoryGame(private val boardSize: Int) {
         val bluePairs = (totalPairs / 4)
         val redPairs = (totalPairs / 4)
         val yellowPairs = (totalPairs - (redPairs + bluePairs)) - 1
-        val blackPair = 1
 
         // Put card
         repeat(redPairs) {
@@ -48,16 +54,96 @@ class MemoryGame(private val boardSize: Int) {
         var index = 0
         for (i in 0 until boardSize) {
             for (j in 0 until boardSize) {
-                board[i][j] = cards[index].apply {isRevealed = true}//cartas viradas(test)
+                board[i][j] = cards[index] //.apply {isRevealed = true}  //Pode usar para testar com as cartas viradas
                 index++
             }
         }
     }
 
-    //jogar num loop na fun Play!!!!!!!!
-    fun printBoard() {
+    //Função adicionar jogador
+    fun addPlayer(name: String, color: String) {
+        players.add(Player(name, color))
+    }
 
-        println("\nTabul:")
+    //Função play
+    fun play() {
+        while (true) {
+            printBoard()
+            val currentPlayer = players[currentPlayerIndex]
+            println("Vez de ${currentPlayer.name} (${currentPlayer.color})")
+
+            val (row1, col1) = getCardPosition("Primeira")
+            board[row1][col1]?.isRevealed = true
+            printBoard() // Mostra o tabuleiro após virar a primeira carta
+
+            val (row2, col2) = getCardPosition("Segunda")
+            board[row2][col2]?.isRevealed = true
+            printBoard() // Mostra o tabuleiro após virar a segunda carta
+
+            val card1 = board[row1][col1]!!
+            val card2 = board[row2][col2]!!
+
+            if (card1.value == card2.value) {
+                println("Acertou!")
+                when (card1.color) {
+                    "Amarelo" -> currentPlayer.score += 1
+                    currentPlayer.color -> currentPlayer.score += 5
+                    "Preto" -> currentPlayer.score += 50
+                    else -> currentPlayer.score += 1
+                }
+                card1.isRevealed = true
+                card2.isRevealed = true
+            } else {
+                println("Errou!")
+                if (card1.color == "Preto" || card2.color == "Preto") {
+                    println("${currentPlayer.name} perdeu o 50 pontos")
+                    currentPlayer.score -= 50
+                }
+                if (card1.color == players[1 - currentPlayerIndex].color) {
+                    currentPlayer.score -= 2
+                }
+                if (currentPlayer.score < 0) currentPlayer.score = 0
+                currentPlayerIndex = 1 - currentPlayerIndex
+
+                // Esconder as cartas
+                card1.isRevealed = false
+                card2.isRevealed = false
+            }
+
+            if (checkWin()) {
+                val winner = if (players[0].score > players[1].score) {
+                    players[0]
+                } else {
+                    players[1]
+                }
+                println("Fim do jogo, o vencedor é ${winner.name } com ${winner.score} pontos!")
+                break
+            }
+        }
+    }
+
+    private fun getCardPosition(cardNumber: String): Pair<Int, Int> {
+        while (true) {
+            println("Digite a linha e a coluna da $cardNumber carta que deseja revelar:")
+            print("Linha: ")
+            val row = readLine()?.toIntOrNull()?.minus(1) ?: continue
+            print("Coluna: ")
+            val col = readLine()?.toIntOrNull()?.minus(1) ?: continue
+
+            if (row in 0 until boardSize && col in 0 until boardSize) {
+                if (board[row][col]?.isRevealed == true) {
+                    println("A carta da posição informada já está virada, por favor, escolha outra posição.")
+                } else {
+                    return Pair(row, col)
+                }
+            } else {
+                println("Posição da carta inválida, por favor, insira uma posição válida.")
+            }
+        }
+    }
+
+    private fun printBoard() {
+        println("\nTabuleiro:")
         for (i in 0 until boardSize) {
             for (j in 0 until boardSize) {
                 val card = board[i][j]
@@ -69,25 +155,14 @@ class MemoryGame(private val boardSize: Int) {
             }
             println()
         }
+        println("Pontuação:")
+        players.forEach { println("${it.name}: ${it.score} pontos") }
     }
 
-    //Função adicionar jogador
-    fun addPlayer(name: String, color: String) {
-        players.add(Player(name, color))
+    private fun checkWin(): Boolean {
+        return board.all { row -> row.all { it?.isRevealed == true } }
     }
-
 }
-
-
-
-
-
-
-
-//fun Play
-
-
-
 
 fun main() {
     println{"Tam tab:"}
@@ -120,11 +195,8 @@ fun main() {
     game.addPlayer(player1Name, "Vermelho")
     game.addPlayer(player2Name, "Azul")
 
-    game.players.forEach { players ->
-        println("Nome: ${players.name}, Cor: ${players.color}")
-    }
 
-    game.printBoard()
+    game.play()
     ///
 
 
