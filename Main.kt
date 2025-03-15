@@ -193,9 +193,9 @@ fun main() {
     val game = MemoryGame(boardSize)
 
     println("Informe o nome do Jogador 1")
-    val player1Name = readLine() ?: "PARTICIPANTE01"
+    val player1Name = readLine()?.takeIf { it.isNotBlank() } ?: "PARTICIPANTE01"
     println("Informe o nome do Jogador 2")
-    val player2Name = readLine() ?: "PARTICIPANTE02"
+    val player2Name = readLine()?.takeIf { it.isNotBlank() } ?: "PARTICIPANTE02"
 
     game.addPlayer(player1Name, "Vermelho")
     game.addPlayer(player2Name, "Azul")
