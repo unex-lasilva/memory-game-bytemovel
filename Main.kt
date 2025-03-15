@@ -8,7 +8,7 @@ import kotlin.text.get
 data class Card(val value: String, val color: String, var isRevealed: Boolean = false)
 data class Player(val name: String, val color: String, var score: Int = 0)
 
-//cosntruror MG
+//construror MemoryGame
 class MemoryGame(private val boardSize: Int) {
     private val board = Array(boardSize) { Array<Card?>(boardSize) { null } }
     private val players = mutableListOf<Player>()
@@ -24,7 +24,7 @@ class MemoryGame(private val boardSize: Int) {
         val cards = mutableListOf<Card>()
         val totalPairs = boardSize * boardSize / 2
 
-        // Distrib pairs
+        // Distribuição dos pairs
         val bluePairs = (totalPairs / 4)
         val redPairs = (totalPairs / 4)
         val yellowPairs = (totalPairs - (redPairs + bluePairs)) - 1
@@ -83,6 +83,7 @@ class MemoryGame(private val boardSize: Int) {
             val card1 = board[row1][col1]!!
             val card2 = board[row2][col2]!!
 
+            // Condição para alterar a pontuação
             if (card1.value == card2.value) {
                 println("Acertou!")
                 when (card1.color) {
@@ -110,6 +111,7 @@ class MemoryGame(private val boardSize: Int) {
                 card2.isRevealed = false
             }
 
+            // Condição para declarar quem ganhou
             if (checkWin()) {
                 val winner = if (players[0].score > players[1].score) {
                     players[0]
@@ -122,6 +124,7 @@ class MemoryGame(private val boardSize: Int) {
         }
     }
 
+    // Função para pegar a posição das cartas
     private fun getCardPosition(cardNumber: String): Pair<Int, Int> {
         while (true) {
             println("Digite a linha e a coluna da $cardNumber carta que deseja revelar:")
@@ -142,6 +145,7 @@ class MemoryGame(private val boardSize: Int) {
         }
     }
 
+    // Função para mostrar o board
     private fun printBoard() {
         println("\nTabuleiro:")
         for (i in 0 until boardSize) {
@@ -159,13 +163,15 @@ class MemoryGame(private val boardSize: Int) {
         players.forEach { println("${it.name}: ${it.score} pontos") }
     }
 
+    // Função para verificar se todas as cartas estão viradas(fim de jogo)
     private fun checkWin(): Boolean {
         return board.all { row -> row.all { it?.isRevealed == true } }
     }
 }
 
 fun main() {
-    println{"Tam tab:"}
+    println("Bem-vindo ao ByteMovel Memory Game!")
+    println("Tamanho do tabuleiro:")
     println("a. 4x4")
     println("b. 6x6")
     println("c. 8x8")
@@ -183,14 +189,13 @@ fun main() {
         }
     }
 
-
     ///
     val game = MemoryGame(boardSize)
 
     println("Informe o nome do Jogador 1")
-    val player1Name = readln()
+    val player1Name = readLine() ?: "PARTICIPANTE01"
     println("Informe o nome do Jogador 2")
-    val player2Name = readln()
+    val player2Name = readLine() ?: "PARTICIPANTE02"
 
     game.addPlayer(player1Name, "Vermelho")
     game.addPlayer(player2Name, "Azul")
@@ -198,6 +203,4 @@ fun main() {
 
     game.play()
     ///
-
-
 }
