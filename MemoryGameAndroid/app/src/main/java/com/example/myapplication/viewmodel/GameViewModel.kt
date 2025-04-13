@@ -75,7 +75,7 @@ class GameViewModel : ViewModel() {
 
     suspend fun onCardClick(row: Int, col: Int) {
         if (row !in 0 until boardSize || col !in 0 until boardSize) {
-            checkMatch() // Chamada para verificar par após delay
+            checkMatch()
             return
         }
 
@@ -101,8 +101,8 @@ class GameViewModel : ViewModel() {
                 )
                 _gameState.value = newState
 
-                delay(1000) // Delay antes de verificar o par
-                checkMatch() // Verifica o par e atualiza a pontuação
+                delay(1000)
+                checkMatch()
             }
         }
     }
@@ -117,10 +117,9 @@ class GameViewModel : ViewModel() {
         val updatedPlayers = players.toMutableList()
         val currentPlayer = updatedPlayers[currentPlayerIndex]
 
-        if (card1.value == card2.value) { // Par correto
-            // Atualiza a pontuação imediatamente
+        if (card1.value == card2.value) {
             when (card1.color) {
-                "Amarelo" -> currentPlayer.score += 2  // Ajustado para 2 conforme sua descrição
+                "Amarelo" -> currentPlayer.score += 2
                 "Vermelho" -> currentPlayer.score += 5
                 "Azul" -> currentPlayer.score += 5
                 "Preto" -> currentPlayer.score += 50
@@ -140,7 +139,7 @@ class GameViewModel : ViewModel() {
             currentPlayerIndex = 1 - currentPlayerIndex // Troca o jogador
         }
 
-        // Atualiza o estado do jogo
+
         updatedPlayers[currentPlayerIndex] = currentPlayer
         val newState = state.copy(
             firstSelectedCard = null,
