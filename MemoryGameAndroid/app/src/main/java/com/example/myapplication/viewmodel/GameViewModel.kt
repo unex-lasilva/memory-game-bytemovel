@@ -1,19 +1,15 @@
 package com.example.myapplication.viewmodel
 
-package com.example.myapplication.viewmodel
-
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.launch
-import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.myapplication.model.Card
-import com.example.myapplication.model.GameState
-import com.example.myapplication.model.Player
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import com.example.myapplication.model.Card
+import com.example.myapplication.model.GameState
+import com.example.myapplication.model.Player
 
 class GameViewModel : ViewModel() {
     private var boardSize = 4
@@ -47,7 +43,7 @@ class GameViewModel : ViewModel() {
         val cards = mutableListOf<Card>()
         val totalPairs = boardSize * boardSize / 2
 
-        // (Mantido seu código original de distribuição de cartas)
+        // Distribuição de cartas
         val bluePairs = (totalPairs / 4)
         val redPairs = (totalPairs / 4)
         val yellowPairs = (totalPairs - (redPairs + bluePairs)) - 1
@@ -103,25 +99,32 @@ class GameViewModel : ViewModel() {
                 )
                 _gameState.value = newState
 
-                // Verifica se é um par ANTES do delay
+                // Verifica se é um par ou combinação especial
                 val (row1, col1) = newState.firstSelectedCard!!
                 val card1 = _board[row1][col1]
                 val card2 = _board[row][col]
 
+                val updatedPlayers = players.toMutableList()
+
                 if (card1.value == card2.value) {
-                    // Atualiza a pontuação IMEDIATAMENTE
-                    val updatedPlayers = players.toMutableList()
+                    // Lógica de pontuação para pares iguais
                     when (card1.color) {
                         "Amarelo" -> updatedPlayers[currentPlayerIndex].score += 1
                         updatedPlayers[currentPlayerIndex].color -> updatedPlayers[currentPlayerIndex].score += 5
                         "Preto" -> updatedPlayers[currentPlayerIndex].score += 50
                         else -> updatedPlayers[currentPlayerIndex].score += 1
                     }
+                } else if ((card1.color == "Preto" && card2.color != "Preto") ||
+                    (card2.color == "Preto" && card1.color != "Preto")) {
+                    updatedPlayers[currentPlayerIndex].score -= 50
 
-                    _gameState.value = newState.copy(players = updatedPlayers)
+                    if (updatedPlayers[currentPlayerIndex].score < 0) {
+                        updatedPlayers[currentPlayerIndex].score = 0
+                    }
                 }
 
-                delay(1000) // Só então faz o delay e continua
+                _gameState.value = newState.copy(players = updatedPlayers)
+                delay(1000) // Delay após atualizar a pontuação
                 checkMatch()
             }
         }
@@ -135,9 +138,22 @@ class GameViewModel : ViewModel() {
         val card1 = _board[row1][col1]
         val card2 = _board[row2][col2]
 
+        val updatedPlayers = players.toMutableList()
+        val rivalColor = players[1 - currentPlayerIndex].color
+
         if (card1.value != card2.value) {
             _board[row1][col1] = card1.copy(isRevealed = false)
             _board[row2][col2] = card2.copy(isRevealed = false)
+
+            // Não fiz no mesmo if para garantir que se o sortudo pegar uma carta do rival e uma preta ele perca 52 pontos
+            if (card1.color == rivalColor || card2.color == rivalColor) {
+                updatedPlayers[currentPlayerIndex].score -= 2
+                // Impede pontuação negativa
+                if (updatedPlayers[currentPlayerIndex].score < 0) {
+                    updatedPlayers[currentPlayerIndex].score = 0
+                }
+            }
+
             currentPlayerIndex = 1 - currentPlayerIndex
         } else {
             _board[row1][col1] = card1.copy(isMatched = true)
@@ -154,7 +170,8 @@ class GameViewModel : ViewModel() {
                 firstSelectedCard = null,
                 secondSelectedCard = null,
                 board = _board.map { it.toList() },
-                currentPlayerIndex = currentPlayerIndex
+                currentPlayerIndex = currentPlayerIndex,
+                players = updatedPlayers // Atualiza jogadores com nova pontuação
             )
         }
     }
